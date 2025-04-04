@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>baseline.md</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+html,footer,header{
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Custom MD PDF CSS
+ */
+html,footer,header{
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+
+ }
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+<link rel="stylesheet" href="file:///home/sagar/DART-LLMs/R%3A%5C2.Travail%5C1.Enseignement%5CCours%5C_1.Outils%5C2.Developpement%5C1.SCSS%5Cmain.css" type="text/css"><link rel="stylesheet" href="file:///home/sagar/DART-LLMs/D%3A%5Crdaros%5CCours%5C_1.Outils%5C2.Developpement%5C1.SCSS%5Cmain.css" type="text/css">
+</head>
+
+<body>
+    <h1 id="loretta-low-rank-economic-tensor-train-adaptation-for-ultra-low-parameter-fine-tuning-of-large-language-models">LoRETTA: Low-Rank Economic Tensor-Train Adaptation for Ultra-Low-Parameter Fine-Tuning of Large Language Models</h1>
+<p><strong>Authors</strong>: Yifan Yang, Jiajun Zhou, Ngai Wong, Zheng Zhang<br>
+<strong>Affiliations</strong>: University of California, Santa Barbara; The University of Hong Kong<br>
+<strong>Code</strong>: <a href="https://github.com/yifanycc/loretta">GitHub Repository</a><br>
+<strong>Paper</strong>: <a href="https://arxiv.org/abs/XXXX.XXXXX">2024.NAACL-Long.174</a></p>
+<hr>
+<h2 id="abstract">Abstract</h2>
+<p>LoRETTA is a parameter-efficient fine-tuning (PEFT) framework for large language models (LLMs) that leverages tensor-train (TT) decomposition to drastically reduce trainable parameters. It introduces two variants:</p>
+<ul>
+<li><strong>LoRETTAₐdₚ</strong>: Uses tensorized adapters for lightweight fine-tuning.</li>
+<li><strong>LoRETTAᵣₑₚ</strong>: Reparameterizes weights via tensor factors for ultra-low parameter updates.</li>
+</ul>
+<p>Key results:</p>
+<ul>
+<li>Achieves <strong>100× fewer parameters</strong> than LoRA/Adapters on LLaMA-2 models.</li>
+<li>Matches or outperforms full fine-tuning and existing PEFT methods across GLUE, SuperGLUE, and generation tasks.</li>
+<li>Demonstrates <strong>anti-overfitting</strong> capabilities and enhanced <strong>multi-task learning</strong> efficiency.</li>
+</ul>
+<hr>
+<h2 id="method">Method</h2>
+<h3 id="tensor-train-tt-decomposition">Tensor-Train (TT) Decomposition</h3>
+<ul>
+<li>Reshapes weight matrices into high-dimensional tensors, decomposed into small tensor factors.</li>
+<li>Reduces parameters from <code>M×N</code> to <code>∑rᵢ₋₁kᵢrᵢ</code> (controlled by TT ranks).</li>
+</ul>
+<h3 id="loretta-variants">LoRETTA Variants</h3>
+<ol>
+<li><strong>LoRETTAₐdₚ</strong>
+<ul>
+<li>Injects tensorized adapters after attention and feed-forward layers.</li>
+<li>Compresses parameters via TT layers (e.g., 1.2K vs. 98K parameters for Adapters).</li>
+</ul>
+</li>
+<li><strong>LoRETTAᵣₑₚ</strong>
+<ul>
+<li>Reparameterizes weight updates using TT factors (e.g., 1K vs. 12K parameters for LoRA).</li>
+<li>Initializes tensor factors via noise reduction to avoid optimization issues.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="experiments">Experiments</h2>
+<h3 id="datasets--models">Datasets &amp; Models</h3>
+<ul>
+<li><strong>BERT-family</strong>: DeBERTa-base, RoBERTa-base (GLUE benchmark).</li>
+<li><strong>LLaMA-2</strong>: 7B, 13B, 70B models (SuperGLUE, SQuAD, DROP).</li>
+<li><strong>Low-data setup</strong>: 1,000 training examples for LLaMA-2 tasks.</li>
+</ul>
+<h3 id="baselines">Baselines</h3>
+<ul>
+<li>Full fine-tuning (FT), LoRA, Adapters, Prefix/Prompt Tuning, BitFit, IA3.</li>
+</ul>
+<h3 id="key-hyperparameters">Key Hyperparameters</h3>
+<ul>
+<li><strong>Learning rate</strong>: <code>1e-4</code> to <code>5e-4</code> (AdamW optimizer).</li>
+<li><strong>Batch size</strong>: 16–32 for BERT-family; 1–2 for LLaMA-2.</li>
+<li><strong>TT ranks</strong>: 2–32 (adaptively adjusted).</li>
+</ul>
+<hr>
+<h2 id="results">Results</h2>
+<h3 id="performance-highlights">Performance Highlights</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Method</th>
+<th>Trainable Params</th>
+<th>SST-2 (Acc)</th>
+<th>SQuAD (F1)</th>
+<th>Avg. GLUE Score</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeBERTa-Base</td>
+<td>LoRETTAₐdₚ</td>
+<td>0.10M</td>
+<td>95.30</td>
+<td>-</td>
+<td>84.96</td>
+</tr>
+<tr>
+<td>LLaMA-2-7B</td>
+<td>LoRETTAₐdₚ</td>
+<td>0.88M</td>
+<td>-</td>
+<td>90.17</td>
+<td>87.0 (BoolQ)</td>
+</tr>
+<tr>
+<td>LLaMA-2-70B</td>
+<td>LoRETTAₐdₚ</td>
+<td>4.79M</td>
+<td>-</td>
+<td><strong>94.33</strong></td>
+<td>74.50 (DROP)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Parameter Efficiency</strong>:
+<ul>
+<li>LoRETTAᵣₑₚ uses <strong>1MB storage</strong> (vs. 3.5MB for LoRA on DeBERTa).</li>
+<li><strong>57× fewer parameters</strong> than Adapters on LLaMA-2-70B.</li>
+</ul>
+</li>
+</ul>
+<h3 id="anti-overfitting--multi-task-learning">Anti-Overfitting &amp; Multi-Task Learning</h3>
+<ul>
+<li><strong>Stable training curves</strong> (Fig. 4) with lower evaluation loss variance.</li>
+<li><strong>Multi-task retention</strong>: LoRETTA achieves <strong>65.45% avg accuracy</strong> vs. 55.70% for LoRA (Table 4).</li>
+</ul>
+<h3 id="memory--computation-efficiency">Memory &amp; Computation Efficiency</h3>
+<ul>
+<li><strong>57.4× less memory</strong> vs. LoRA on LLaMA-2-7B.</li>
+<li><strong>Reduced FLOPs</strong>: <code>6.14E+15</code> for LoRETTAₐdₚ vs. <code>6.18E+15</code> for Adapters.</li>
+</ul>
+<p>Here's a structured presentation of the results from the tables and a guide to recreate <strong>Figure 4</strong> using Python:</p>
+<hr>
+<h3 id="table-1-glue-benchmark-results-bert-family-models"><strong>Table 1: GLUE Benchmark Results (BERT-family Models)</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Model &amp; Method</th>
+<th>Train. Params (M)</th>
+<th>MNLI</th>
+<th>SST-2</th>
+<th>MRPC</th>
+<th>CoLA</th>
+<th>QNLI</th>
+<th>QQP</th>
+<th>RTE</th>
+<th>STS-B</th>
+<th>Avg.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeBERTa-Base (FT)</td>
+<td>139.19</td>
+<td>88.67</td>
+<td>94.61</td>
+<td>91.98</td>
+<td>59.32</td>
+<td>93.04</td>
+<td>91.42</td>
+<td>68.23</td>
+<td>91.10</td>
+<td>84.79</td>
+</tr>
+<tr>
+<td>DeBERTa-Base (LoRETTAₐdₚ)</td>
+<td>0.10</td>
+<td>85.93</td>
+<td>95.30</td>
+<td>93.53</td>
+<td>60.84</td>
+<td>92.99</td>
+<td>84.08</td>
+<td>75.50</td>
+<td>91.32</td>
+<td><strong>84.96</strong></td>
+</tr>
+<tr>
+<td>DeBERTa-Base (LoRETTAᵣₑₚ)</td>
+<td>0.05</td>
+<td>86.80</td>
+<td>95.53</td>
+<td>88.73</td>
+<td>59.69</td>
+<td>93.25</td>
+<td>89.20</td>
+<td>75.81</td>
+<td>90.66</td>
+<td>84.95</td>
+</tr>
+<tr>
+<td>RoBERTa-Base (LoRETTAₐdₚ)</td>
+<td>0.10</td>
+<td>85.61</td>
+<td>94.38</td>
+<td>91.08</td>
+<td>62.70</td>
+<td>92.12</td>
+<td>87.22</td>
+<td>78.70</td>
+<td>90.26</td>
+<td><strong>85.26</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="table-2-llama-2-7b-performance-low-data-setting"><strong>Table 2: LLaMA-2-7B Performance (Low-Data Setting)</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Model &amp; Method</th>
+<th>Train. Params (M)</th>
+<th>CB</th>
+<th>BoolQ</th>
+<th>WSC</th>
+<th>COPA</th>
+<th>ReCoRD</th>
+<th>SQuAD</th>
+<th>DROP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLaMA2-7B (FT)</td>
+<td>6738.42</td>
+<td>66.07</td>
+<td>84.6</td>
+<td>63.46</td>
+<td>86</td>
+<td>81.1</td>
+<td>90.71</td>
+<td>51.38</td>
+</tr>
+<tr>
+<td>LLaMA2-7B (LoRETTAₐdₚ)</td>
+<td>0.88</td>
+<td>66.07</td>
+<td><strong>87.0</strong></td>
+<td><strong>63.46</strong></td>
+<td><strong>87</strong></td>
+<td>80.0</td>
+<td>90.17</td>
+<td><strong>51.60</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="table-3-llama-2-13b70b-performance"><strong>Table 3: LLaMA-2-13B/70B Performance</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Model &amp; Method</th>
+<th>Train. Params (M)</th>
+<th>COPA</th>
+<th>ReCoRD</th>
+<th>SQuAD</th>
+<th>DROP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLaMA2-70B (LoRETTAₐdₚ)</td>
+<td>4.79</td>
+<td>-</td>
+<td>-</td>
+<td><strong>94.33</strong></td>
+<td><strong>74.50</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="table-4-multi-task-learning-anti-forgetting"><strong>Table 4: Multi-Task Learning Anti-Forgetting</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Model &amp; Method</th>
+<th>SST-2</th>
+<th>MRPC</th>
+<th>QNLI</th>
+<th>Avg.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeBERTa-Base (LoRETTAₐdₚ)</td>
+<td>52.29</td>
+<td>39.22</td>
+<td>91.52</td>
+<td>61.01</td>
+</tr>
+<tr>
+<td>DeBERTa-Base (LoRETTAᵣₑₚ)</td>
+<td>51.26</td>
+<td><strong>52.94</strong></td>
+<td><strong>92.15</strong></td>
+<td><strong>65.45</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="table-5-memory--flops-efficiency"><strong>Table 5: Memory &amp; FLOPs Efficiency</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Model &amp; Method</th>
+<th>Memory (µs)</th>
+<th>FLOPs (Reduction)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLaMA2-7B (LoRETTAₐdₚ)</td>
+<td><strong>9879</strong></td>
+<td><strong>6.14E+15</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="table-6-tensor-rank-analysis"><strong>Table 6: Tensor Rank Analysis</strong></h3>
+<table>
+<thead>
+<tr>
+<th>LoRETTAₐdₚ (Rank)</th>
+<th>SST-2</th>
+<th>QNLI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r=2</td>
+<td>95.41</td>
+<td>92.04</td>
+</tr>
+<tr>
+<td>r=5</td>
+<td>95.30</td>
+<td>92.99</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="table-7-tensor-shape-configuration"><strong>Table 7: Tensor Shape Configuration</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Tensor Shape</th>
+<th>Params (M)</th>
+<th>SST-2</th>
+<th>MRPC</th>
+<th>QNLI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[8,8,12,8,8]</td>
+<td>0.10</td>
+<td>95.30</td>
+<td>93.53</td>
+<td>93.25</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+
+</html>

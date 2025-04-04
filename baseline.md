@@ -1,171 +1,129 @@
-# Baselines for TT Decomposition Experiments
+# LoRETTA: Low-Rank Economic Tensor-Train Adaptation for Ultra-Low-Parameter Fine-Tuning of Large Language Models
 
-These are the baseline experiments for applying Tensor-Train (TT) decomposition to both Fully Connected Networks (FNNs) and ResNets on CIFAR-10 and MNIST datasets. The experiments are conducted across three levels of optimization:
-1. **Baseline GPU (PyTorch Implementation)**
-2. **Custom CUDA Kernel Implementation**
-3. **Triton Kernel + SafeTensors Optimization**
-
-The following sections describe the experimental setup, metrics, results, and key observations.
+**Authors**: Yifan Yang, Jiajun Zhou, Ngai Wong, Zheng Zhang  
+**Affiliations**: University of California, Santa Barbara; The University of Hong Kong  
+**Code**: [GitHub Repository](https://github.com/yifanycc/loretta)  
+**Paper**: [2024.NAACL-Long.174](https://arxiv.org/abs/XXXX.XXXXX)  
 
 ---
 
-## 1. Experimental Setup
+## Abstract
+LoRETTA is a parameter-efficient fine-tuning (PEFT) framework for large language models (LLMs) that leverages tensor-train (TT) decomposition to drastically reduce trainable parameters. It introduces two variants:  
+- **LoRETTAₐdₚ**: Uses tensorized adapters for lightweight fine-tuning.  
+- **LoRETTAᵣₑₚ**: Reparameterizes weights via tensor factors for ultra-low parameter updates.  
 
-### 1.1. Datasets
-
-- **CIFAR-10:**  
-  - 60,000 images (50,000 training, 10,000 testing)  
-  - Image size: 32×32×3, 10 classes
-
-- **MNIST:**  
-  - 70,000 images (60,000 training, 10,000 testing)  
-  - Image size: 28×28 (flattened to 784), 10 classes
-
-### 1.2. Neural Network Architectures
-
-#### Fully Connected Network (FNN)
-- **Input:**  
-  - MNIST: 784 features  
-  - CIFAR-10: 3072 features (32×32×3)
-- **Hidden Layers:**  
-  - 3 fully connected layers (512 neurons each)
-- **Output:**  
-  - Softmax classifier for 10 classes
-
-#### ResNet (Modified)
-- **Architecture:**  
-  - Standard ResNet-18 with fully connected (FC) layers replaced by TT-decomposed layers.
-- **TT Decomposition Setup:**  
-  - For CIFAR-10: Tensorize 3072 as `[16, 16, 12]`
-  - For MNIST: Tensorize 784 as `[28, 28]` (or an alternative valid factorization)
-  - **Initial TT Ranks:** `[1, 4, 4, 1]`
-
-### 1.3. Optimization Levels
-
-1. **Baseline GPU (PyTorch):**  
-   - Use standard PyTorch implementations of TT layers.
-2. **CUDA Kernel:**  
-   - Implement custom CUDA kernels for optimized TT matrix multiplications.
-3. **Triton Kernel + SafeTensors:**  
-   - Use Triton-optimized kernels and SafeTensors for efficient weight storage and further reduction in latency and memory usage.
+Key results:  
+- Achieves **100× fewer parameters** than LoRA/Adapters on LLaMA-2 models.  
+- Matches or outperforms full fine-tuning and existing PEFT methods across GLUE, SuperGLUE, and generation tasks.  
+- Demonstrates **anti-overfitting** capabilities and enhanced **multi-task learning** efficiency.  
 
 ---
 
-## 2. Evaluation Metrics
+## Method
+### Tensor-Train (TT) Decomposition
+- Reshapes weight matrices into high-dimensional tensors, decomposed into small tensor factors.  
+- Reduces parameters from `M×N` to `∑rᵢ₋₁kᵢrᵢ` (controlled by TT ranks).  
 
-The experiments are evaluated based on the following metrics:
-
-- **Accuracy (%):** Classification accuracy on test sets.
-- **Compression Ratio:** The ratio of parameters after TT decomposition relative to the original model (e.g., a compression ratio of 0.70 implies a 30% reduction in parameters).
-- **Effective TT-Ranks:** Final effective ranks after adaptive pruning.
-- **Memory Usage (MB):** Total memory footprint of the model.
-- **Inference Latency (ms):** Time taken per inference pass.
-- **Computational Overhead (GFLOPs):** Estimated floating-point operations per inference.
-
----
-
-## 3. Baseline Results
-
-### 3.1. Fully Connected Networks (FNN)
-
-#### CIFAR-10
-
-| Model                   | Method                      | Accuracy (%) | Compression Ratio | TT-Ranks (Effective)      | Memory (MB) | Latency (ms) | GFLOPs  |
-|-------------------------|-----------------------------|--------------|-------------------|---------------------------|-------------|--------------|---------|
-| **FNN (Dense)**         | No TT                       | 85           | 1.0× (baseline)   | N/A                       | 200         | 50           | 2.0     |
-| **FNN + TT**            | Baseline GPU (PyTorch)      | 83           | ~30% reduction   | [1, 4, 4, 1] (avg ~3.5)    | 140         | 55           | 2.2     |
-| **FNN + TT**            | CUDA Kernel                 | 83.5         | ~30% reduction   | [1, 4, 4, 1] (similar)     | 135         | 45           | 1.8     |
-| **FNN + TT**            | Triton + SafeTensors        | 83.2         | ~40% reduction   | [1, 3, 3, 1] (reduced)     | 120         | 40           | 1.6     |
-
-#### MNIST
-
-| Model                   | Method                      | Accuracy (%) | Compression Ratio | TT-Ranks (Effective)      | Memory (MB) | Latency (ms) | GFLOPs  |
-|-------------------------|-----------------------------|--------------|-------------------|---------------------------|-------------|--------------|---------|
-| **FNN (Dense)**         | No TT                       | 98           | 1.0× (baseline)   | N/A                       | 50          | 20           | 0.5     |
-| **FNN + TT**            | Baseline GPU (PyTorch)      | 97           | ~25% reduction   | [1, 4, 4, 1] (avg ~3.5)    | 37.5        | 22           | 0.55    |
-| **FNN + TT**            | CUDA Kernel                 | 97.1         | ~25% reduction   | [1, 4, 4, 1] (similar)     | 37          | 18           | 0.45    |
-| **FNN + TT**            | Triton + SafeTensors        | 97.0         | ~35% reduction   | [1, 3, 3, 1] (reduced)     | 32          | 16           | 0.4     |
-
-![fnn](./plots/mnist_cifar_fnn.png)
+### LoRETTA Variants
+1. **LoRETTAₐdₚ**  
+   - Injects tensorized adapters after attention and feed-forward layers.  
+   - Compresses parameters via TT layers (e.g., 1.2K vs. 98K parameters for Adapters).  
+2. **LoRETTAᵣₑₚ**  
+   - Reparameterizes weight updates using TT factors (e.g., 1K vs. 12K parameters for LoRA).  
+   - Initializes tensor factors via noise reduction to avoid optimization issues.  
 
 ---
 
-### 3.2. ResNet (Modified for TT Decomposition)
+## Experiments
+### Datasets & Models
+- **BERT-family**: DeBERTa-base, RoBERTa-base (GLUE benchmark).  
+- **LLaMA-2**: 7B, 13B, 70B models (SuperGLUE, SQuAD, DROP).  
+- **Low-data setup**: 1,000 training examples for LLaMA-2 tasks.  
 
-#### CIFAR-10
+### Baselines
+- Full fine-tuning (FT), LoRA, Adapters, Prefix/Prompt Tuning, BitFit, IA3.  
 
-| Model                   | Method                      | Accuracy (%) | Compression Ratio | TT-Ranks (Effective)      | Memory (MB) | Latency (ms) | GFLOPs  |
-|-------------------------|-----------------------------|--------------|-------------------|---------------------------|-------------|--------------|---------|
-| **ResNet (Dense)**      | No TT                       | 94           | 1.0× (baseline)   | N/A                       | 100         | 30           | 3.0     |
-| **ResNet + TT**         | Baseline GPU (PyTorch)      | 93           | ~30% reduction   | [1, 4, 4, 1] (avg ~3.5)    | 70          | 32           | 3.2     |
-| **ResNet + TT**         | CUDA Kernel                 | 93.2         | ~30% reduction   | [1, 4, 4, 1]              | 68          | 28           | 2.8     |
-| **ResNet + TT**         | Triton + SafeTensors        | 93.1         | ~40% reduction   | [1, 3, 3, 1] (reduced)     | 60          | 26           | 2.6     |
-
-#### MNIST (if applied to ResNet)
-
-| Model                   | Method                      | Accuracy (%) | Compression Ratio | TT-Ranks (Effective)      | Memory (MB) | Latency (ms) | GFLOPs  |
-|-------------------------|-----------------------------|--------------|-------------------|---------------------------|-------------|--------------|---------|
-| **ResNet (Dense)**      | No TT                       | 99           | 1.0× (baseline)   | N/A                       | 60          | 20           | 1.5     |
-| **ResNet + TT**         | Baseline GPU (PyTorch)      | 98.5         | ~25% reduction   | [1, 4, 4, 1]              | 45          | 22           | 1.55    |
-| **ResNet + TT**         | CUDA Kernel                 | 98.6         | ~25% reduction   | [1, 4, 4, 1]              | 44          | 19           | 1.45    |
-| **ResNet + TT**         | Triton + SafeTensors        | 98.5         | ~35% reduction   | [1, 3, 3, 1]              | 40          | 18           | 1.4     |
-
-![cknn](./plots/mnist_cifar_cnn.png)
----
-
-## 4. Analysis & Discussion
-
-### 4.1. Accuracy Impact
-- **FNNs:**  
-  - The TT-decomposed FNNs incur a minor accuracy drop (~1-2%) relative to the dense baseline.
-  - Adaptive methods with custom CUDA kernels and Triton optimizations help recover or slightly improve performance.
-
-- **ResNets:**  
-  - Modified ResNets using TT layers maintain high accuracy (around 93% on CIFAR-10, 98.5% on MNIST) despite significant parameter reduction.
-
-### 4.2. Compression & TT-Rank Reduction
-- **FNNs:**  
-  - Baseline GPU implementation reduces parameters by ~30%, while advanced optimizations (Triton + SafeTensors) achieve up to ~40% reduction.
-  - Effective TT ranks are reduced from the initial [1, 4, 4, 1] to approximately [1, 3, 3, 1] in the optimized runs.
-
-- **ResNets:**  
-  - Similar compression trends are observed with ~30-40% reduction in model size.
-  - The effective TT ranks in ResNet TT layers are consistent with FNN results.
-
-### 4.3. Computational Overhead & Latency
-- **Latency:**  
-  - Custom CUDA kernels reduce latency by about 10–20% compared to the baseline PyTorch implementation.
-  - Triton + SafeTensors further reduce latency by approximately 15–20%, making these models more suitable for edge deployment.
-
-- **GFLOPs & Memory:**  
-  - Optimized implementations show slight reductions in GFLOPs due to efficient TT contractions.
-  - Memory usage is also reduced significantly when using SafeTensors.
+### Key Hyperparameters
+- **Learning rate**: `1e-4` to `5e-4` (AdamW optimizer).  
+- **Batch size**: 16–32 for BERT-family; 1–2 for LLaMA-2.  
+- **TT ranks**: 2–32 (adaptively adjusted).  
 
 ---
 
-## 5. Conclusion
+## Results
+### Performance Highlights
+| Model          | Method           | Trainable Params | SST-2 (Acc) | SQuAD (F1) | Avg. GLUE Score |
+|----------------|------------------|------------------|-------------|------------|-----------------|
+| DeBERTa-Base   | LoRETTAₐdₚ       | 0.10M            | 95.30       | -          | 84.96           |
+| LLaMA-2-7B     | LoRETTAₐdₚ       | 0.88M            | -           | 90.17      | 87.0 (BoolQ)    |
+| LLaMA-2-70B    | LoRETTAₐdₚ       | 4.79M            | -           | **94.33**  | 74.50 (DROP)    |
 
-The baseline experiments demonstrate that:
-- TT decomposition applied to FNNs and ResNets can achieve significant compression (25–40% parameter reduction) with minimal accuracy loss.
-- Optimizing TT operations with custom CUDA kernels and Triton + SafeTensors further reduces computational overhead and latency.
-- The trade-offs between compression, effective TT ranks, and model performance are promising for future work on adaptive fine-tuning and deployment in resource-constrained environments.
+- **Parameter Efficiency**:  
+  - LoRETTAᵣₑₚ uses **1MB storage** (vs. 3.5MB for LoRA on DeBERTa).  
+  - **57× fewer parameters** than Adapters on LLaMA-2-70B.  
+
+### Anti-Overfitting & Multi-Task Learning
+- **Stable training curves** (Fig. 4) with lower evaluation loss variance.  
+- **Multi-task retention**: LoRETTA achieves **65.45% avg accuracy** vs. 55.70% for LoRA (Table 4).  
+
+### Memory & Computation Efficiency
+- **57.4× less memory** vs. LoRA on LLaMA-2-7B.  
+- **Reduced FLOPs**: `6.14E+15` for LoRETTAₐdₚ vs. `6.18E+15` for Adapters.  
+
+Here's a structured presentation of the results from the tables and a guide to recreate **Figure 4** using Python:
 
 ---
 
-## 6. Future Work
-- **Adaptive Rank Selection:** Integrate dynamic, data-driven TT rank selection (using differentiable regularization and Gumbel-Softmax) into the baseline pipeline.
-- **Extension to Other Architectures:** Apply the framework to Transformers, GNNs, and speech models.
-- **Real-World Deployment:** Test on edge devices and multi-GPU systems to evaluate practical benefits.
+### **Table 1: GLUE Benchmark Results (BERT-family Models)**
+| Model & Method          | Train. Params (M) | MNLI  | SST-2 | MRPC  | CoLA  | QNLI  | QQP   | RTE   | STS-B | Avg.  |
+|-------------------------|-------------------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
+| DeBERTa-Base (FT)       | 139.19           | 88.67 | 94.61 | 91.98 | 59.32 | 93.04 | 91.42 | 68.23 | 91.10 | 84.79 |
+| DeBERTa-Base (LoRETTAₐdₚ) | 0.10             | 85.93 | 95.30 | 93.53 | 60.84 | 92.99 | 84.08 | 75.50 | 91.32 | **84.96** |
+| DeBERTa-Base (LoRETTAᵣₑₚ) | 0.05             | 86.80 | 95.53 | 88.73 | 59.69 | 93.25 | 89.20 | 75.81 | 90.66 | 84.95 |
+| RoBERTa-Base (LoRETTAₐdₚ) | 0.10             | 85.61 | 94.38 | 91.08 | 62.70 | 92.12 | 87.22 | 78.70 | 90.26 | **85.26** |
 
 ---
 
-## 7. References
-
-- **Oseledets, I. V. (2011).** *Tensor-Train Decomposition.* SIAM Journal on Scientific Computing.
-- **Yang, Y., Zhou, J., Wong, N., & Zhang, Z. (2024).** *LoRETTA: Low-Rank Economic Tensor-Train Adaptation for Ultra-Low-Parameter Fine-Tuning of Large Language Models.* NAACL 2024.
-- **Jang, E., Gu, S., & Poole, B. (2017).** *Categorical Reparameterization with Gumbel-Softmax.* ICLR.
-- Additional references as needed.
+### **Table 2: LLaMA-2-7B Performance (Low-Data Setting)**
+| Model & Method          | Train. Params (M) | CB    | BoolQ | WSC   | COPA  | ReCoRD | SQuAD | DROP  |
+|-------------------------|-------------------|-------|-------|-------|-------|--------|-------|-------|
+| LLaMA2-7B (FT)          | 6738.42          | 66.07 | 84.6  | 63.46 | 86    | 81.1   | 90.71 | 51.38 |
+| LLaMA2-7B (LoRETTAₐdₚ)  | 0.88             | 66.07 | **87.0** | **63.46** | **87** | 80.0   | 90.17 | **51.60** |
 
 ---
 
+### **Table 3: LLaMA-2-13B/70B Performance**
+| Model & Method          | Train. Params (M) | COPA | ReCoRD | SQuAD | DROP  |
+|-------------------------|-------------------|------|--------|-------|-------|
+| LLaMA2-70B (LoRETTAₐdₚ) | 4.79              | -    | -      | **94.33** | **74.50** |
+
+---
+
+### **Table 4: Multi-Task Learning Anti-Forgetting**
+| Model & Method          | SST-2 | MRPC  | QNLI  | Avg.  |
+|-------------------------|-------|-------|-------|-------|
+| DeBERTa-Base (LoRETTAₐdₚ) | 52.29 | 39.22 | 91.52 | 61.01 |
+| DeBERTa-Base (LoRETTAᵣₑₚ) | 51.26 | **52.94** | **92.15** | **65.45** |
+
+---
+
+### **Table 5: Memory & FLOPs Efficiency**
+| Model & Method          | Memory (µs) | FLOPs (Reduction) |
+|-------------------------|-------------|--------------------|
+| LLaMA2-7B (LoRETTAₐdₚ)  | **9879**    | **6.14E+15**       |
+
+---
+
+### **Table 6: Tensor Rank Analysis**
+| LoRETTAₐdₚ (Rank) | SST-2 | QNLI  |
+|--------------------|-------|-------|
+| r=2               | 95.41 | 92.04 |
+| r=5               | 95.30 | 92.99 |
+
+---
+
+### **Table 7: Tensor Shape Configuration**
+| Tensor Shape       | Params (M) | SST-2 | MRPC  | QNLI  |
+|--------------------|------------|-------|-------|-------|
+| [8,8,12,8,8]      | 0.10       | 95.30 | 93.53 | 93.25 |
 
